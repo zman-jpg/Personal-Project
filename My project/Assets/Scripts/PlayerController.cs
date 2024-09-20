@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
             canFire = false;
             currentClip--;
-            StartCoroutine("cooldownFire");
+            StartCoroutine("cooldown");
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -125,6 +125,8 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
     }
+
+    
 
     private void OnTriggerEnter(Collider other)
     {
