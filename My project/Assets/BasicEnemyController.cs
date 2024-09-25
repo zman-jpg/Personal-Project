@@ -7,15 +7,14 @@ public class BasicEnemyController : MonoBehaviour
 {
     public PlayerController player;
     public NavMeshAgent agent;
-    public Transform target;
 
     [Header("Enemy Stats")]
     public int health = 3;
     public int maxHealth = 5;
     public int damageGiven = 1;
     public int damageReceived = 1;
-    public float speed = 3;
     public float pushBackForce = 5;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,9 +25,8 @@ public class BasicEnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        target = GameObject.Find("Player").transform;
 
-        agent.destination = target.position;
+        agent.destination = player.transform.position;
 
         if (health <= 0)
             Destroy(gameObject);
@@ -41,10 +39,12 @@ public class BasicEnemyController : MonoBehaviour
             health -= damageReceived;
             Destroy(collision.gameObject);
         }
-        if(collision.gameObject.tag == "player")
+
+        if(collision.gameObject.tag == "Player" && !player.takenDamage)
         {
             if (collision.gameObject.GetComponent<PlayerController>().takenDamage)
             {
+                player.takenDamage = true;
                 player.health -= damageGiven;
                 player.gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * pushBackForce);
                 player.StartCoroutine("cooldownDamage");
