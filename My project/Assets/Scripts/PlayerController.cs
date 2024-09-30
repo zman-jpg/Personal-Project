@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class PlayerController : MonoBehaviour
 {
     Rigidbody myRB;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
+    public Transform weaponSlot2;
     public GameObject shot;
     public float shotVel = 0;
     public int weaponID = -1;

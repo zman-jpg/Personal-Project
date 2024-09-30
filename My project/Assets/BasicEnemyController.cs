@@ -7,6 +7,7 @@ public class BasicEnemyController : MonoBehaviour
 {
     public PlayerController player;
     public NavMeshAgent agent;
+    public Transform target;
 
     [Header("Enemy Stats")]
     public int health = 3;
@@ -25,6 +26,8 @@ public class BasicEnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        target = GameObject.Find("Player").transform;
+
 
         agent.destination = player.transform.position;
 
