@@ -25,39 +25,41 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        healthBar.fillAmount = Mathf.Clamp(((float)playerData.health / (float)playerData.maxHealth), 0, 1);
-
-        if (playerData.weaponID < 0)
+        if (playerData != null)
         {
-            clipCounter.gameObject.SetActive(false);
-            ammoCounter.gameObject.SetActive(false);
+            healthBar.fillAmount = Mathf.Clamp(((float)playerData.health / (float)playerData.maxHealth), 0, 1);
+
+            if (playerData.weaponID < 0)
+            {
+                clipCounter.gameObject.SetActive(false);
+                ammoCounter.gameObject.SetActive(false);
+            }
+
+            else
+            {
+                clipCounter.gameObject.SetActive(true);
+                clipCounter.text = "Clip: " + playerData.currentClip + "/" + playerData.clipSize;
+
+                ammoCounter.gameObject.SetActive(true);
+                ammoCounter.text = "Ammo: " + playerData.currentAmmo;
+            }
+
+            if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
+            {
+                isPaused = true;
+
+                pauseMenu.SetActive(true);
+
+                Time.timeScale = 0;
+
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
+            else if (isPaused && Input.GetKeyDown(KeyCode.Escape))
+                Resume();
         }
-
-        else
-        {
-            clipCounter.gameObject.SetActive(true);
-            clipCounter.text = "Clip: " + playerData.currentClip + "/" + playerData.clipSize;
-
-            ammoCounter.gameObject.SetActive(true);
-            ammoCounter.text = "Ammo: " + playerData.currentAmmo;
-        }
-
-        if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
-        {
-            isPaused = true;
-
-            pauseMenu.SetActive(true);
-
-            Time.timeScale = 0;
-
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
-        else if (isPaused && Input.GetKeyDown(KeyCode.Escape))
-            Resume();
     }
-
     public void Resume()
     {
         isPaused = false;

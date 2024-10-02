@@ -5,10 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody myRB;
-    Camera playerCam;
+    public GameManager gm;
 
-    Transform cameraHolder;
+    public Rigidbody myRB;
+    public Camera playerCam;
+
+    public Transform cameraHolder;
 
     Vector2 camRotation;
 
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         myRB = GetComponent<Rigidbody>();
         playerCam = Camera.main;
         cameraHolder = transform.GetChild(0);
@@ -64,55 +67,57 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (health <= 0)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-        camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-
-        camRotation.y = Mathf.Clamp(camRotation.y, -90, 90);
-
-        playerCam.transform.position = cameraHolder.position;
-
-        playerCam.transform.rotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
-        transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
-
-        if(Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
+        if (!gm.isPaused)
         {
-            GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
-            s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
-            Destroy(s, bulletLifespan);
+            if (health <= 0)
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
-            canFire = false;
-            currentClip--;
-            StartCoroutine("cooldown");
+            camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+            camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+
+            camRotation.y = Mathf.Clamp(camRotation.y, -90, 90);
+
+            playerCam.transform.position = cameraHolder.position;
+
+            playerCam.transform.rotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
+            transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
+
+            if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
+            {
+                GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
+                s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
+                Destroy(s, bulletLifespan);
+
+                canFire = false;
+                currentClip--;
+                StartCoroutine("cooldown");
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+                reloadClip();
+
+            sprinting = (((!sprinting) && (!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && Input.GetAxisRaw("Vertical") <= 0)));
+
+            Vector3 temp = myRB.velocity;
+
+            temp.x = Input.GetAxisRaw("Horizontal") * speed;
+            temp.z = Input.GetAxisRaw("Vertical") * speed;
+
+            if (sprinting)
+                temp.z *= sprintMult;
+
+            if (sprinting && sprintToggle && (Input.GetAxisRaw("Vertical") <= 0))
+                sprinting = false;
+
+            if (sprinting && Input.GetKeyUp(KeyCode.LeftShift))
+                sprinting = false;
+
+            if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
+                temp.y = jumpHeight;
+
+            myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
         }
-
-        if (Input.GetKeyDown(KeyCode.R))
-            reloadClip();
-
-        sprinting = (((!sprinting) && (!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && Input.GetAxisRaw("Vertical") <= 0)));
-
-        Vector3 temp = myRB.velocity;
-
-        temp.x = Input.GetAxisRaw("Horizontal") * speed;
-        temp.z = Input.GetAxisRaw("Vertical") * speed;
-
-        if (sprinting)
-            temp.z *= sprintMult;
-
-        if (sprinting && sprintToggle && (Input.GetAxisRaw("Vertical") <= 0))
-            sprinting = false;
-
-        if (sprinting && Input.GetKeyUp(KeyCode.LeftShift))
-            sprinting = false;
-
-        if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
-            temp.y = jumpHeight;
-
-        myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
     }
-
     private void OnCollisionEnter(Collision collision)
     {
         if ((collision.gameObject.tag == "healthPickup") && health < maxHealth)

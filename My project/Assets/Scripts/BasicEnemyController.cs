@@ -45,13 +45,10 @@ public class BasicEnemyController : MonoBehaviour
 
         if(collision.gameObject.tag == "Player" && !player.takenDamage)
         {
-            if (collision.gameObject.GetComponent<PlayerController>().takenDamage)
-            {
                 player.takenDamage = true;
                 player.health -= damageGiven;
                 player.gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * pushBackForce);
                 player.StartCoroutine("cooldownDamage");
-            }
         }
     }
 }
