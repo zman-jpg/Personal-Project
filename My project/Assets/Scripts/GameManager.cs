@@ -12,6 +12,13 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public PlayerController playerData;
 
+    public GameObject completeLevelUI;
+
+    public void CompleteLevel ()
+    {
+        completeLevelUI.SetActive(true);
+    }
+
     public Image healthBar;
     public TextMeshProUGUI clipCounter;
     public TextMeshProUGUI ammoCounter;
