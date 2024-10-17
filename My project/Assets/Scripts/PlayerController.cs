@@ -78,16 +78,14 @@ public class PlayerController : MonoBehaviour
 
             camRotation.y = Mathf.Clamp(camRotation.y, -90, 90);
 
-            playerCam.transform.position = cameraHolder.position;
-
-            playerCam.transform.rotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
+            cameraHolder.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
             transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
             if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
             {
                 weaponSpeaker.Play();
                 GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
-                s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
+                s.GetComponent<Rigidbody>().AddForce(playerCam.transform.position *shotVel);
                 Destroy(s, bulletLifespan);
 
                 canFire = false;
@@ -171,6 +169,20 @@ public class PlayerController : MonoBehaviour
                     reloadAmt = 20;
                     bulletLifespan = .5f;
                     break;
+
+                case "weapon2":
+                    weaponID = 1;
+                    shotVel = 10000;
+                    fireMode = 0;
+                    fireRate = 0.1f;
+                    currentClip = 30;
+                    clipSize = 30;
+                    maxAmmo = 400;
+                    currentAmmo = 200;
+                    reloadAmt = 20;
+                    bulletLifespan = .5f;
+                    break;
+
 
                 default:
                     break;
